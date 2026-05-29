@@ -7,16 +7,105 @@
  */
 
 plugins {
-    // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
     `java-gradle-plugin`
+    jacoco
 
-    // Apply the Kotlin JVM plugin to add support for Kotlin.
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.publish)
+    alias(libs.plugins.spotless)
 }
 
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+}
+
+group = "io.github.sfali23"
+
+spotless {
+    java {
+        target("src/**/*.java")
+        googleJavaFormat("1.35.0")
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+        // Custom rule to replace 3+ newlines with just 2
+        replaceRegex("Remove extra newlines", "\\n\\n\\n+", "\n\n")
+    }
+
+    kotlin {
+        target("src/**/*.kt")
+        trimTrailingWhitespace()
+        endWithNewline()
+        // Custom rule to replace 3+ newlines with just 2
+        replaceRegex("Remove extra newlines", "\\n\\n\\n+", "\n\n")
+    }
+
+    kotlinGradle {
+        target("*.gradle.kts")
+        ktlint()
+    }
+}
+
+java {
+    withSourcesJar()
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+    }
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    options.release.set(21)
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+}
+
+val createPluginClasspathFile by tasks.registering {
+    inputs.files(sourceSets.main.get().runtimeClasspath)
+    outputs.dir(temporaryDir)
+    doLast {
+        file("$temporaryDir/plugin-classpath.txt").writeText(
+            sourceSets.main
+                .get()
+                .runtimeClasspath
+                .joinToString("\n"),
+        )
+    }
+}
+
+configurations {
+    create("jacocoRuntime")
+}
+
+val createJacocoAgentClasspathFile by tasks.registering {
+    inputs.files(configurations["jacocoRuntime"])
+    outputs.dir(temporaryDir)
+    doLast {
+        val jacocoAgentClasspathFile = file("$temporaryDir/jacoco-agent-classpath.txt")
+        jacocoAgentClasspathFile.writeText(
+            """|${configurations["jacocoRuntime"].asPath}
+               |${tasks.jacocoTestReport.get().reports.xml.outputLocation.get().asFile.absolutePath}
+            """.trimMargin(),
+        )
+    }
+}
+
+dependencies {
+    implementation(libs.jgit)
+    implementation(libs.jgit.ssh)
+
+    testImplementation(libs.jgit.junit)
+    testImplementation(libs.typesafe)
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.junit.platform.suit)
+    testRuntimeOnly(libs.junit.platform.launcher)
+
+    add("jacocoRuntime", "org.jacoco:org.jacoco.agent:${jacoco.toolVersion}:runtime")
+
+    testRuntimeOnly(files(createPluginClasspathFile.get()))
+    testRuntimeOnly(files(createJacocoAgentClasspathFile.get()))
 }
 
 testing {
@@ -35,6 +124,9 @@ testing {
             dependencies {
                 // functionalTest test suite depends on the production code in tests
                 implementation(project())
+                implementation(libs.cucumber.java)
+                implementation(libs.cucumber.expressions)
+                runtimeOnly(libs.cucumber.junit.platform.engine)
             }
 
             targets {
@@ -56,6 +148,16 @@ gradlePlugin {
 }
 
 gradlePlugin.testSourceSets.add(sourceSets["functionalTest"])
+
+tasks.jacocoTestReport {
+    reports {
+        xml.required.set(true)
+    }
+}
+
+tasks.processTestResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
 
 tasks.named<Task>("check") {
     // Include functionalTest as part of the check lifecycle
