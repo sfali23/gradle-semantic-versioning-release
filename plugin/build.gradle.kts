@@ -132,7 +132,7 @@ testing {
             targets {
                 all {
                     // This test suite should run after the built-in test suite has run its tests
-                    testTask.configure { shouldRunAfter(test) } 
+                    testTask.configure { shouldRunAfter(test) }
                 }
             }
         }
@@ -140,10 +140,17 @@ testing {
 }
 
 gradlePlugin {
-    // Define the plugin
-    val greeting by plugins.creating {
-        id = "org.example.greeting"
-        implementationClass = "org.example.GradleSemanticVersioningReleasePlugin"
+    website = "https://github.com/sfali23/gradle-semantic-build-versioning"
+    vcsUrl = "https://github.com/sfali23/gradle-semantic-build-versioning"
+    plugins {
+        create("semanticBuildVersioningPlugin") {
+            id = "io.github.sfali23.gradle-semantic-build-versioning"
+            implementationClass = "semverrelease.SemanticBuildVersioningPlugin"
+            displayName = "Gradle Semantic Build Versioning Plugin"
+            description =
+                "This is a Gradle settings-plugin that provides support for semantic versioning of builds. It is quite easy to use and extremely configurable. The plugin allows you to bump the major, minor, patch or pre-release version based on the latest version, which is identified from a git tag. It also allows you to bump pre-release versions based on a scheme that you define. The version can be bumped by using version-component-specific project properties or can be bumped automatically based on the contents of a commit message. If no manual bumping is done via commit message or project property, the plugin will increment the version-component with the lowest precedence; this is usually the patch version, but can be the pre-release version if the latest version is a pre-release one. The plugin does its best to ensure that you do not accidentally violate semver rules while generating your versions; in cases where this might happen the plugin forces you to be explicit about violating these rules. As this is a settings plugin, it is applied to settings.gradle and version calculation is therefore performed right at the start of the build, before any projects are configured. This means that the project version is immediately available (almost as if it were set explicitly - which it effectively is), and will never change during the build (barring some other, external task that attempts to modify the version during the build). While the build is running, tagging or changing the project properties will not influence the version that was calculated at the start of the build."
+            tags.set(listOf("versioning", "semantic-versioning", "git", "build-versioning", "auto-versioning", "version"))
+        }
     }
 }
 
