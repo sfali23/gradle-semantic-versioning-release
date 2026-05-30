@@ -9,6 +9,9 @@ clean:
 test:
 	$(GRADLE) test
 
+functionalTest:
+	$(GRADLE) functionalTest
+
 spotless:
 	$(GRADLE) spotlessApply
 

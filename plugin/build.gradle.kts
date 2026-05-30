@@ -124,9 +124,13 @@ testing {
             dependencies {
                 // functionalTest test suite depends on the production code in tests
                 implementation(project())
+                implementation(sourceSets.test.get().output)
+                implementation(libs.jgit)
+                implementation(libs.typesafe)
                 implementation(libs.cucumber.java)
                 implementation(libs.cucumber.expressions)
-                runtimeOnly(libs.cucumber.junit.platform.engine)
+                implementation(libs.cucumber.junit.platform.engine)
+                implementation(libs.junit.platform.suit)
             }
 
             targets {

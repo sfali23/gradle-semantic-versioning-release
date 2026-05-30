@@ -194,7 +194,7 @@ class SemanticBuildVersion(workingDir: File, val baseConfig: SemanticBuildVersio
             if (snapshotConfig.useShortHash) {
                 runCatching { adapter.getShortHash() }.getOrNull()
             } else {
-                runCatching { adapter.getHeadCommit().name() }.getOrNull()
+                runCatching { adapter.getFullHash() }.getOrNull()
             }
         } else null
 

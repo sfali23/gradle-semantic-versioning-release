@@ -42,6 +42,9 @@ class JGitAdapter(workingDir: File, initialize: Boolean = false) {
     fun getShortHash(): String = getShortHash(getHeadCommit())
 
     @Throws(IOException::class)
+    fun getFullHash(): String = getHeadCommit().name()
+
+    @Throws(IOException::class)
     fun getCurrentBranch(): String = repository.branch
 
     private fun getRevWalk(): RevWalk = RevWalk(repository)
