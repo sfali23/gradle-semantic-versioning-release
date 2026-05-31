@@ -60,7 +60,9 @@ class StepDefinitions {
 
     @When("A tag with annotated: \\({bool}) flag is created")
     fun createAnnotatedTag(annotated: Boolean) {
-        repository.tag(SemanticBuildVersion(workingDirectory, config).determineVersion(), annotated)
+        val nextVersion = SemanticBuildVersion(workingDirectory, config).determineVersion()
+        val tag = "${config.tagPrefix}$nextVersion"
+        repository.tag(tag, annotated)
     }
 
     @When("No changes made to repository")
@@ -79,20 +81,18 @@ class StepDefinitions {
     @Then("Generated version should be {string}")
     fun assertVersion(expectedVersion: String) {
         val snapshotConfig = config.snapshotConfig
-        val currentTag = adapter.getCurrentHeadTag(
-            tagPrefix = config.tagPrefix,
-            snapshotSuffix = snapshotConfig.prefix,
-            preReleaseConfig = config.preReleaseConfig
-        )
+        val currentTag = SemanticBuildVersion(workingDirectory, config).latestVersion()?.toStringValue()
         val result =
             if (currentTag?.contains(snapshotConfig.prefix) == true) {
-                if (snapshotConfig.appendCommitHash) {
-                    val hash =
-                        if (snapshotConfig.useShortHash) adapter.getShortHash()
-                        else adapter.getFullHash()
+                val hash =
+                    if (snapshotConfig.appendCommitHash) {
+                        val hash =
+                            if (snapshotConfig.useShortHash) adapter.getShortHash()
+                            else adapter.getFullHash()
 
-                    "$expectedVersion+$hash"
-                } else expectedVersion
+                        "+$hash"
+                    } else ""
+                "$expectedVersion$hash"
             } else expectedVersion
 
         assertEquals(result, currentTag)

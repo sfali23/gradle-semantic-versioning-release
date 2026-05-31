@@ -1,8 +1,6 @@
 package com.alphasystem.gradle.semver.release.test
 
-import com.alphasystem.gradle.semver.release.common.JGitAdapter
 import com.alphasystem.gradle.semver.release.internal.SemanticBuildVersionConfiguration
-import com.alphasystem.gradle.semver.release.internal.Version
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 import semverrelease.AutoBump
@@ -72,12 +70,3 @@ fun Config.toSemanticBuildVersionConfiguration() =
 
 fun toSemanticBuildVersionConfiguration(src: String): SemanticBuildVersionConfiguration =
     ConfigFactory.parseString(src).toSemanticBuildVersionConfiguration()
-
-fun JGitAdapter.getCurrentHeadTag(
-    tagPrefix: String = DefaultTagPrefix,
-    snapshotSuffix: String = DefaultSnapshotPrefix,
-    preReleaseConfig: PreReleaseConfig = PreReleaseConfig()
-): String? {
-    return this.getTagsForCurrentBranch().map { it.replace(tagPrefix, "") }
-        .mapNotNull { runCatching { Version.create(it, snapshotSuffix, preReleaseConfig) }.getOrNull() }.getOrNull(0)?.toStringValue()
-}
