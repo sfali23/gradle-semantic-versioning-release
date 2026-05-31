@@ -309,3 +309,22 @@ Feature: Branch with Auto bump repository
       | feat:             | false     | 0.6.0           |
       | BREAKING CHANGE:  | true      | 1.0.0           |
       | BREAKING CHANGE:  | false     | 1.0.0           |
+
+  @auto-bump
+  @new
+  Scenario Outline: Override tagPrefix as a empty string
+    Given Record main branch
+    And Load semantic build config from ({tagPrefix=""})
+    And Following annotated: <annotated> tags (0.1.0) has been created
+    And Branch 'test' is created and checked out
+    When Make changes and commit with message: '[minor] version update'
+    And Main branch is checked out
+    And Merge branch 'test' into current branch
+    And A tag with annotated: (<annotated>) flag is created
+    Then Generated version should be '0.2.0'
+    And Close resources
+
+    Examples:
+      | annotated |
+      | true      |
+      | false     |
