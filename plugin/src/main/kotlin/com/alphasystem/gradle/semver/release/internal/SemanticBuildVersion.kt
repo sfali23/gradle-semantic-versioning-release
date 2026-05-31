@@ -20,7 +20,7 @@ class SemanticBuildVersion(workingDir: File, val baseConfig: SemanticBuildVersio
         return adapter.getTagsForCurrentBranch()
             .filter { it.startsWith(tagPrefix) }
             .map { it.replace(tagPrefix, "") }
-            .mapNotNull { version -> runCatching { Version.create(version, snapshotSuffix, preReleaseConfig) }.getOrNull() }
+            .mapNotNull { runCatching { Version.create(it, snapshotSuffix, preReleaseConfig) }.getOrNull() }
             .sortedWith(Version.VERSION_COMPARATOR).getOrNull(0)
     }
 
