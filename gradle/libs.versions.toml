@@ -14,7 +14,6 @@ cucumber-expressions = "16.1.2"
 
 [libraries]
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
-jgit-ssh = { module = "org.eclipse.jgit:org.eclipse.jgit.ssh.apache", version.ref = "jgit" }
 jgit-junit = { module = "org.eclipse.jgit:org.eclipse.jgit.junit", version.ref = "jgit" }
 typesafe = { module = "com.typesafe:config", version.ref = "typesafe" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }

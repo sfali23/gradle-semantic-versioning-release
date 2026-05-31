@@ -12,6 +12,9 @@ test:
 functionalTest:
 	$(GRADLE) functionalTest
 
+allTests:
+	$(GRADLE) test functionalTest
+
 spotless:
 	$(GRADLE) spotlessApply
 

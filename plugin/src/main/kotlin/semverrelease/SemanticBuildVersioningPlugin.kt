@@ -47,7 +47,6 @@ abstract class SemanticBuildVersioningPlugin : Plugin<Project> {
 
         project.tasks.register("pushTag", PushTagTask::class.java) {
             it.workingDirectory.set(project.projectDir)
-            it.config.set(config)
         }
     }
 

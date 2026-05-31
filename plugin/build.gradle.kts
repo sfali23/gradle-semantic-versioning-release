@@ -94,7 +94,6 @@ val createJacocoAgentClasspathFile by tasks.registering {
 
 dependencies {
     implementation(libs.jgit)
-    implementation(libs.jgit.ssh)
 
     testImplementation(libs.jgit.junit)
     testImplementation(libs.typesafe)

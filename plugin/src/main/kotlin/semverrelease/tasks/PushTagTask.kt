@@ -1,15 +1,12 @@
 package semverrelease.tasks
 
 import com.alphasystem.gradle.semver.release.common.JGitAdapter
-import com.alphasystem.gradle.semver.release.internal.SemanticBuildVersionConfiguration
+import com.alphasystem.gradle.semver.release.internal.pushTag
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.UntrackedTask
-import semverrelease.ANSI_GREEN
-import semverrelease.ANSI_RESET
 import semverrelease.RELEASE_GROUP
 
 /**
@@ -33,13 +30,10 @@ import semverrelease.RELEASE_GROUP
  * - Uses the JGit adapter to push the constructed tag to the remote repository.
  */
 @UntrackedTask(because = "Git tag pushing involves external state and should not be cached")
-abstract class PushTagTask: DefaultTask() {
+abstract class PushTagTask : DefaultTask() {
 
     @get:Internal
     abstract val workingDirectory: RegularFileProperty
-
-    @get:Internal
-    abstract val config: Property<SemanticBuildVersionConfiguration>
 
     init {
         group = RELEASE_GROUP
@@ -47,11 +41,5 @@ abstract class PushTagTask: DefaultTask() {
     }
 
     @TaskAction
-    fun pushChanges() {
-        val workingDir = workingDirectory.get().asFile
-        val baseConfig = config.get()
-        val tag = "${baseConfig.tagPrefix}${project.version}"
-        println("${ANSI_GREEN}Pushing tag: $tag$ANSI_RESET")
-        JGitAdapter(workingDir).pushTag(tag)
-    }
+    fun pushChanges() = JGitAdapter(workingDirectory.get().asFile).pushTag()
 }

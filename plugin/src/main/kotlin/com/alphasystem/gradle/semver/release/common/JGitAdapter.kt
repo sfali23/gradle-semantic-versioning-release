@@ -9,10 +9,6 @@ import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
-import org.eclipse.jgit.transport.PushResult
-import org.eclipse.jgit.transport.SshSessionFactory
-import org.eclipse.jgit.transport.sshd.SshdSessionFactoryBuilder
-import org.eclipse.jgit.util.FS
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -24,7 +20,7 @@ import java.util.stream.StreamSupport
  * supports various Git-related operations such as retrieving commits, branches, tags, and analyzing
  * repository states.
  */
-class JGitAdapter(workingDir: File, initialize: Boolean = false) {
+class JGitAdapter(val workingDir: File, initialize: Boolean = false) {
     private val repository = initRepository(workingDir, initialize)
     private val git = Git(repository)
 
@@ -64,8 +60,6 @@ class JGitAdapter(workingDir: File, initialize: Boolean = false) {
         return emptyList()
     }
 
-    fun getTag(tag: String): Ref? = repository.findRef("${Constants.R_TAGS}$tag")
-
     fun createTag(tag: String, annotated: Boolean, message: String?): Ref? =
         git.tag()
             .setName(tag)
@@ -73,12 +67,6 @@ class JGitAdapter(workingDir: File, initialize: Boolean = false) {
             .setAnnotated(annotated)
             .let { if (annotated) it.setMessage(message) else it }
             .call()
-
-    fun pushTag(tag: String): List<PushResult> {
-        configureJGitSsh()
-        val ref = getTag(tag) ?: throw RuntimeException("Tag $tag not found")
-        return git.push().add(ref).call().toList().filterNotNull()
-    }
 
     fun getUnReleasedCommits(start: String): List<String> = getUnReleasedCommits(start, Constants.HEAD)
 
@@ -170,19 +158,6 @@ class JGitAdapter(workingDir: File, initialize: Boolean = false) {
 
         private fun getNonNullObjectId(ref: Ref): ObjectId {
             return Optional.ofNullable(ref.peeledObjectId).orElseGet { ref.objectId }
-        }
-
-        private fun configureJGitSsh() {
-            if (SshSessionFactory.getInstance() != null) {
-                return
-            }
-
-            val sshSessionFactory = SshdSessionFactoryBuilder()
-                .setHomeDirectory(FS.DETECTED.userHome())
-                .setSshDirectory(FS.DETECTED.userHome().resolve(".ssh"))
-                .build(null)
-
-            SshSessionFactory.setInstance(sshSessionFactory)
         }
     }
 }

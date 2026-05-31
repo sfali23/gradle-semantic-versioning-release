@@ -1,5 +1,6 @@
 package com.alphasystem.gradle.semver.release.internal
 
+import com.alphasystem.gradle.semver.release.common.JGitAdapter
 import semverrelease.ComponentToBump
 import semverrelease.PreReleaseConfig
 
@@ -35,3 +36,10 @@ private fun isNumeric(str: String?): Boolean {
 }
 
 fun ComponentToBump.toVersionComponent() = VersionComponent.valueOf(this.name)
+
+fun JGitAdapter.pushTag(): Int {
+    val processBuilder = ProcessBuilder("git", "push", "--tags")
+    processBuilder.directory(this.workingDir)
+    processBuilder.inheritIO()
+    return processBuilder.start().waitFor()
+}
