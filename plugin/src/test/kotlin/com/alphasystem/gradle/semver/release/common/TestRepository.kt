@@ -1,9 +1,5 @@
 package com.alphasystem.gradle.semver.release.common
 
-import org.eclipse.jgit.lib.Constants
-import org.eclipse.jgit.revwalk.RevTag
-import org.eclipse.jgit.revwalk.RevWalk
-import org.eclipse.jgit.transport.URIish
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
@@ -21,10 +17,6 @@ class TestRepository(val workingDirectory: File, initialize: Boolean = true) {
 
     fun close() {
         repository.close()
-    }
-
-    fun commitAndTag(tag: String): TestRepository {
-        return commitAndTag(tag, false)
     }
 
     fun commitAndTag(tag: String, annotated: Boolean): TestRepository {
@@ -107,14 +99,6 @@ class TestRepository(val workingDirectory: File, initialize: Boolean = true) {
         return this
     }
 
-    fun checkout(revString: String): TestRepository {
-        try {
-            return checkoutBranch(repository.resolve(revString)!!.name)
-        } catch (e: IOException) {
-            throw RuntimeException("Failed to resolve revision: $revString", e)
-        }
-    }
-
     fun branch(name: String): TestRepository {
         try {
             git.branchCreate().setName(name).call()
@@ -136,14 +120,6 @@ class TestRepository(val workingDirectory: File, initialize: Boolean = true) {
         }
     }
 
-    fun getFullBranchName(): String {
-        return try {
-            repository.fullBranch
-        } catch (e: IOException) {
-            throw RuntimeException("Failed to get full branch name", e)
-        }
-    }
-
     fun merge(target: String): TestRepository {
         try {
             val result = git.merge().include(repository.findRef(target)).call()
@@ -157,48 +133,6 @@ class TestRepository(val workingDirectory: File, initialize: Boolean = true) {
             throw RuntimeException("Failed to merge from: $target", e)
         }
         return this
-    }
-
-    fun setOrigin(origin: TestRepository): TestRepository {
-        try {
-            git.remoteAdd()
-                .setName("origin")
-                .setUri(URIish(origin.repository.directory.toURI().toURL()))
-                .call()
-        } catch (e: Exception) {
-            throw RuntimeException("Failed to set origin", e)
-        }
-        return this
-    }
-
-    fun getHeadTag(): String {
-        return try {
-            git.describe().setTarget(repository.resolve(Constants.HEAD)).call()
-        } catch (e: Exception) {
-            throw RuntimeException("Failed to get head tag", e)
-        }
-    }
-
-    fun isHeadTagAnnotated(): RevTag {
-        return try {
-            RevWalk(repository).parseAny(repository.resolve(getHeadTag())) as RevTag
-        } catch (e: IOException) {
-            throw RuntimeException("Failed to check if head tag is annotated", e)
-        }
-    }
-
-    fun getHeadTagMessage(): Optional<String> {
-        return try {
-            val revWalk = RevWalk(repository)
-            val tagObject = revWalk.parseAny(repository.resolve(getHeadTag()))
-            if (tagObject is RevTag) {
-                Optional.of(tagObject.fullMessage)
-            } else {
-                Optional.empty()
-            }
-        } catch (e: IOException) {
-            throw RuntimeException("Failed to get head tag message", e)
-        }
     }
 
     companion object {

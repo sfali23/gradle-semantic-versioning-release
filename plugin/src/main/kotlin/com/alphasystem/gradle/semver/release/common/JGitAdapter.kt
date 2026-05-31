@@ -74,8 +74,6 @@ class JGitAdapter(workingDir: File, initialize: Boolean = false) {
             .let { if (annotated) it.setMessage(message) else it }
             .call()
 
-    fun createTag(tag: String, annotated: Boolean): Ref? = createTag(tag, annotated, null)
-
     fun pushTag(tag: String): List<PushResult> {
         configureJGitSsh()
         val ref = getTag(tag) ?: throw RuntimeException("Tag $tag not found")
