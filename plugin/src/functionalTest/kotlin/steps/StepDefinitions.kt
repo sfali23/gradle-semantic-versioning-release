@@ -62,7 +62,8 @@ class StepDefinitions {
     fun createAnnotatedTag(annotated: Boolean) {
         val nextVersion = SemanticBuildVersion(workingDirectory, config).determineVersion()
         val tag = "${config.tagPrefix}$nextVersion"
-        repository.tag(tag, annotated)
+        val message = if (annotated) "Release: $tag" else null
+        repository.tag(tag, annotated, message)
     }
 
     @When("No changes made to repository")
