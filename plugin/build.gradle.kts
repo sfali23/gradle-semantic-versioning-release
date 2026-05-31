@@ -143,11 +143,11 @@ testing {
 }
 
 gradlePlugin {
-    website = "https://github.com/sfali23/gradle-semantic-build-versioning"
-    vcsUrl = "https://github.com/sfali23/gradle-semantic-build-versioning"
+    website = "https://github.com/sfali23/gradle-semantic-versioning-release"
+    vcsUrl = "https://github.com/sfali23/gradle-semantic-versioning-release"
     plugins {
         create("semanticBuildVersioningPlugin") {
-            id = "io.github.sfali23.gradle-semantic-build-versioning"
+            id = "io.github.sfali23.gradle-semantic-versioning-release"
             implementationClass = "semverrelease.SemanticBuildVersioningPlugin"
             displayName = "Gradle Semantic Build Versioning Plugin"
             description =
@@ -172,4 +172,38 @@ tasks.processTestResources {
 tasks.named<Task>("check") {
     // Include functionalTest as part of the check lifecycle
     dependsOn(testing.suites.named("functionalTest"))
+}
+
+mavenPublishing {
+    publishToMavenCentral(automaticRelease = true)
+    signAllPublications()
+
+    coordinates("io.github.sfali23", "gradle-semantic-versioning-release")
+
+    pom {
+        name.set("Gradle Semantic Build Versioning Plugin")
+        description.set("This is a Gradle settings-plugin that provides support for semantic versioning of builds.")
+        url.set("https://github.com/sfali23/gradle-semantic-versioning-release")
+
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+            }
+        }
+
+        developers {
+            developer {
+                id.set("sfali23")
+                name.set("Syed Farhan Ali")
+                email.set("f.syed.ali@gmail.com")
+            }
+        }
+
+        scm {
+            connection.set("scm:git:git://github.com/sfali23/gradle-semantic-versioning-release.git")
+            developerConnection.set("scm:git:ssh://github.com:sfali23/gradle-semantic-versioning-release.git")
+            url.set("https://github.com/sfali23/gradle-semantic-versioning-release/tree/main")
+        }
+    }
 }
