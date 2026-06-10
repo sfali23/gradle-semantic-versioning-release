@@ -75,6 +75,9 @@ abstract class SemanticBuildVersioningPlugin : Plugin<Project> {
         if (extension.componentToBump.isPresent) {
             config = config.copy(componentToBump = extension.componentToBump.get())
         }
+        if (extension.autoBump.isPresent) {
+            config = config.copy(autoBump = extension.autoBump.get())
+        }
         if (extension.snapshotConfig.isPresent) {
             config = config.copy(snapshotConfig = extension.snapshotConfig.get())
         }

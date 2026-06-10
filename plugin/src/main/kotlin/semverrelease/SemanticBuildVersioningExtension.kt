@@ -38,6 +38,9 @@ abstract class SemanticBuildVersioningExtension(project: Project) {
     val componentToBump: Property<ComponentToBump> = objects.property(ComponentToBump::class.java)
 
     @get:Nested
+    val autoBump: Property<AutoBump> = objects.property(AutoBump::class.java)
+
+    @get:Nested
     val snapshotConfig: Property<SnapshotConfig> = objects.property(SnapshotConfig::class.java)
 
     @get:Nested
