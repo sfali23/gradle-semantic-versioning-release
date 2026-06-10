@@ -200,3 +200,7 @@ mavenPublishing {
         }
     }
 }
+
+semverrelease {
+    addUnReleasedCommitsToTagComment.set(true)
+}

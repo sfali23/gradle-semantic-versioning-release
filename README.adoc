@@ -43,6 +43,7 @@ semverrelease {
     autoBump.set(AutoBump(majorPattern = "\\[major]".toRegex(), minorPattern = "\\[minor]".toRegex(), patchPattern = "\\[patch]".toRegex(),
         newPreReleasePattern = "\\[new-pre-release]".toRegex(), promoteToReleasePattern = "\\[promote]".toRegex()))
     hotfixBranchPattern.set("^v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\+$".toRegex())
+    releaseTagComment.set("Releasing")
 }
 ----
 
