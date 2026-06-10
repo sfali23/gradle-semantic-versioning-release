@@ -9,7 +9,7 @@ class SemanticBuildVersioningPluginTest {
 
     @Test fun `plugin registers extension`() {
         val project = ProjectBuilder.builder().build()
-        project.plugins.apply("io.github.sfali23.gradle-semantic-build-versioning")
+        project.plugins.apply("io.github.sfali23.gradle-semantic-versioning-release")
         assertNotNull(project.extensions.findByName("semverrelease"))
 
         val extension = project.extensions.getByName("semverrelease") as SemanticBuildVersioningExtension
