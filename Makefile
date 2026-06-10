@@ -20,3 +20,6 @@ spotless:
 
 publishLocal:
 	$(GRADLE) publishToMavenLocal
+
+publish:
+	$(GRADLE) setReleaseVersion publishToMavenCentral createTag pushTag

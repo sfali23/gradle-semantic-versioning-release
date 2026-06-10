@@ -11,6 +11,7 @@ junit-jupiter = "5.10.0"
 junit-platform = "1.10.0"
 cucumber-java = "7.14.0"
 cucumber-expressions = "16.1.2"
+gradle-semver-release-plugin = "0.1.0"
 
 [libraries]
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
@@ -27,3 +28,4 @@ cucumber-junit-platform-engine = { module = "io.cucumber:cucumber-junit-platform
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-jvm" }
 publish = { id = "com.vanniktech.maven.publish", version.ref = "publish" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+gradle-semver-release = { id = "io.github.sfali23.gradle-semantic-versioning-release", version.ref = "gradle-semver-release-plugin" }
