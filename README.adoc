@@ -8,7 +8,7 @@ This project is inspired by the https://github.com/vivin/gradle-semantic-build-v
 
 == Introduction
 
-This is a Gradle plugin that provides support for https://semver.org/[semantic versioning] of builds. It is quite easy to use and extremely configurable. The plugin allows you to bump the major, minor, patch or pre-release version based on the latest version, which is identified from a git tag. It also allows you to bump pre-release versions based on a scheme that you define. The version can be bumped by using version-component-specific project properties or can be bumped automatically based on the contents of a commit message. If no manual bumping is done via commit message or project property, the plugin will increment the version-component with the lowest precedence; this is usually the patch version, but can be the pre-release version if the latest version is a pre-release one. The plugin does its best to ensure that you do not accidentally violate semver rules while generating your versions; in cases where this might happen the plugin forces you to be explicit about violating these rules.
+This is a Gradle plugin that provides support for https://semver.org/[semantic versioning] of builds. It is quite easy to use and extremely configurable. The plugin allows you to bump the major, minor, patch or pre-release version based on the latest version, which is identified from a git tag. It also allows you to bump pre-release versions based on a scheme that you define. The version can be bumped by using version-component-specific project properties or can be bumped automatically based on the contents of a commit message. If no manual bumping is done via commit message or project property, the plugin will increment the version-component with the lowest precedence; this is usually the patch version, but can be the pre-release version if the latest version is a pre-release one. The plugin does its best to ensure that you do not accidentally violate semver rules while generating your versions; in cases where this might happen, the plugin forces you to be explicit about violating these rules.
 
 == Usage
 
@@ -16,6 +16,36 @@ This is a Gradle plugin that provides support for https://semver.org/[semantic v
 ----
 id("io.github.sfali23.gradle-semantic-versioning-release") version ("0.3.0")
 ----
+
+This plugin defines the following tasks:
+
+=== setReleaseVersion
+
+Determine and sets the next applicable version based on configuration.
+
+=== printVersion
+
+Prints the next applicable version based on configuration.
+
+=== createTag
+
+Creates `git` tag. The `setReleaseVersion` task must be called before calling this task.
+
+=== pushTag
+
+Pushes the tag created by `createTag` task.
+
+[IMPORTANT]
+====
+This is *NOT* a _publish_ plugin. It must be used alongside _publish_ plugin of your choice.
+
+For example, this project used `com.vanniktech.maven.publish` to publish artifacts to `Maven` central. It runs tasks in the following order:
+
+[source, shell]
+----
+    ./gradlew setReleaseVersion publishToMavenCentral createTag pushTag
+----
+====
 
 == Plugin Settings
 The following are plugin settings:
@@ -222,7 +252,7 @@ It is useful to check out a tag when you want to create a build of an older vers
 Collects unreleased commits to be added into `releaseTagComment` if `addUnReleasedCommitsToTagComment` settings is set to __true__.
 
 === addUnReleasedCommitsToTagComment
-Default comment of the release tag is `Release <version_to_be_released>`, this setting allows to add un-released commits to tag summary. With setting on tag comment will be:
+The default comment of the release tag is `Release <version_to_be_released>`, this setting allows to add un-released commits to tag summary. With this setting on tag comment will be:
 
 [source]
 ----
