@@ -166,9 +166,13 @@ tasks.named<Task>("check") {
     dependsOn(testing.suites.named("functionalTest"))
 }
 
+val isLocalPublish = gradle.startParameter.taskNames.any { it.contains("publishToMavenLocal") }
+
 mavenPublishing {
     publishToMavenCentral(automaticRelease = true)
-    signAllPublications()
+    if (!isLocalPublish) {
+        signAllPublications()
+    }
 
     coordinates("io.github.sfali23", "gradle-semantic-versioning-release")
 
