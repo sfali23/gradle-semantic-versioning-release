@@ -6,5 +6,24 @@
  * This project uses @Incubating APIs which are subject to change.
  */
 
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+        mavenCentral()
+    }
+    plugins {
+        id("io.github.sfali23.gradle-semantic-versioning-release") version "0.4.0"
+    }
+}
+
+plugins {
+    id("io.github.sfali23.gradle-semantic-versioning-release")
+}
+
+semverrelease {
+    addUnReleasedCommitsToTagComment.set(true)
+}
+
 rootProject.name = "gradle-semantic-versioning-release"
 include("plugin")
