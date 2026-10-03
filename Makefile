@@ -22,4 +22,4 @@ publishLocal:
 	$(GRADLE) publishToMavenLocal
 
 release:
-	$(GRADLE) setReleaseVersion publishToMavenCentral createTag pushTag
+	$(GRADLE) publishToMavenCentral createTag pushTag

@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.publish)
     alias(libs.plugins.spotless)
-    alias(libs.plugins.gradle.semver.release)
 }
 
 repositories {
@@ -199,8 +198,4 @@ mavenPublishing {
             url.set("https://github.com/sfali23/gradle-semantic-versioning-release/tree/main")
         }
     }
-}
-
-semverrelease {
-    addUnReleasedCommitsToTagComment.set(true)
 }
