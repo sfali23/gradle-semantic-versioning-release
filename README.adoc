@@ -12,28 +12,34 @@ This is a Gradle plugin that provides support for https://semver.org/[semantic v
 
 == Usage
 
+Apply the plugin in your `settings.gradle.kts` file:
+
 [source,kotlin]
 ----
-id("io.github.sfali23.gradle-semantic-versioning-release") version ("0.3.0")
+plugins {
+    id("io.github.sfali23.gradle-semantic-versioning-release") version ("0.4.0")
+}
+
+semverrelease {
+    addUnReleasedCommitsToTagComment.set(true)
+}
 ----
 
-This plugin defines the following tasks:
+The plugin computes the project version at build startup and sets `project.version` on the root project and every subproject.
 
-=== setReleaseVersion
-
-Determine and sets the next applicable version based on configuration.
+This plugin defines the following tasks on the root project:
 
 === printVersion
 
-Prints the next applicable version based on configuration.
+Prints the current project version.
 
 === createTag
 
-Creates `git` tag. The `setReleaseVersion` task must be called before calling this task.
+Creates a `git` tag with the current project version.
 
 === pushTag
 
-Pushes the tag created by `createTag` task.
+Pushes the tag created by the `createTag` task.
 
 [IMPORTANT]
 ====
@@ -43,7 +49,7 @@ For example, this project used `com.vanniktech.maven.publish` to publish artifac
 
 [source, shell]
 ----
-    ./gradlew setReleaseVersion publishToMavenCentral createTag pushTag
+    ./gradlew publishToMavenCentral createTag pushTag
 ----
 ====
 

@@ -1,20 +1,67 @@
 package semverrelease
 
-import org.gradle.testfixtures.ProjectBuilder
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
+import com.alphasystem.gradle.semver.release.common.TestRepository
+import org.gradle.testkit.runner.GradleRunner
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.io.File
+import java.nio.file.Files
 
 class SemanticBuildVersioningPluginTest {
 
-    @Test fun `plugin registers extension`() {
-        val project = ProjectBuilder.builder().build()
-        project.plugins.apply("io.github.sfali23.gradle-semantic-versioning-release")
-        assertNotNull(project.extensions.findByName("semverrelease"))
+    @Test
+    fun `settings plugin propagates computed version to all projects`() {
+        val projectDir = Files.createTempDirectory("settings-plugin-test").toFile()
+        val repository = TestRepository(projectDir)
+        try {
+            repository.makeChanges().commit("initial commit")
 
-        val extension = project.extensions.getByName("semverrelease") as SemanticBuildVersioningExtension
-        extension.startingVersion.set("1.0.0")
+            projectDir.resolve("settings.gradle.kts").writeText(
+                """
+                plugins {
+                    id("io.github.sfali23.gradle-semantic-versioning-release")
+                }
 
-        assertEquals("1.0.0", extension.startingVersion.get(), "Starting version is not set correctly")
+                semverrelease {
+                    addUnReleasedCommitsToTagComment.set(false)
+                }
+
+                rootProject.name = "root"
+                include(":sub")
+                """.trimIndent(),
+            )
+
+            projectDir.resolve("build.gradle.kts").writeText(
+                """
+                tasks.register("printRootVersion") {
+                    doLast { println("ROOT_VERSION=${'$'}{project.version}") }
+                }
+                """.trimIndent(),
+            )
+
+            projectDir.resolve("sub").mkdirs()
+            projectDir.resolve("sub/build.gradle.kts").writeText(
+                """
+                tasks.register("printSubVersion") {
+                    doLast { println("SUB_VERSION=${'$'}{project.version}") }
+                }
+                """.trimIndent(),
+            )
+
+            val result =
+                GradleRunner
+                    .create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .withArguments("printRootVersion", "sub:printSubVersion", "--quiet")
+                    .build()
+
+            val output = result.output
+            assertTrue(output.contains("ROOT_VERSION=0.1.0"), "Expected root version 0.1.0 but output was:\n$output")
+            assertTrue(output.contains("SUB_VERSION=0.1.0"), "Expected subproject version 0.1.0 but output was:\n$output")
+        } finally {
+            repository.close()
+            projectDir.deleteRecursively()
+        }
     }
 }
