@@ -1,56 +1,58 @@
 package semverrelease
 
+import com.alphasystem.gradle.semver.release.internal.SemanticBuildVersion
 import com.alphasystem.gradle.semver.release.internal.SemanticBuildVersionConfiguration
 import org.gradle.api.Plugin
-import org.gradle.api.Project
+import org.gradle.api.initialization.Settings
 import org.gradle.api.plugins.BasePlugin
-import semverrelease.tasks.SetReleaseVersionTask
-import semverrelease.tasks.PushTagTask
 import semverrelease.tasks.CreateTagTask
+import semverrelease.tasks.PushTagTask
 
-abstract class SemanticBuildVersioningPlugin : Plugin<Project> {
+abstract class SemanticBuildVersioningPlugin : Plugin<Settings> {
 
-    private var config = SemanticBuildVersionConfiguration()
+    override fun apply(settings: Settings) {
+        val extension =
+            settings.extensions.create(
+                "semverrelease",
+                SemanticBuildVersioningExtension::class.java,
+            )
+        extension.releaseTagComment.convention("Releasing")
+        extension.addUnReleasedCommitsToTagComment.convention(false)
 
-    override fun apply(project: Project) {
-        // ensure the base plugin is applied
-        if (!project.plugins.hasPlugin(BasePlugin::class.java)) {
-            project.plugins.apply(BasePlugin::class.java)
+        settings.gradle.projectsLoaded { gradle ->
+            val config = buildConfig(extension)
+            val version = SemanticBuildVersion(settings.rootDir, config).determineVersion()
+            gradle.allprojects { it.version = version }
         }
 
-        val extension = project.extensions.create("semverrelease", SemanticBuildVersioningExtension::class.java, project)
-
-        project.afterEvaluate {
-            buildConfig(extension)
-        }
-
-        val setReleaseVersion = project.tasks.register("setReleaseVersion", SetReleaseVersionTask::class.java) {
-            it.config.set(config)
-            it.workingDirectory.set(project.projectDir)
-        }
-
-        project.tasks.register("printVersion") { it ->
-            it.group = RELEASE_GROUP
-            it.description = "Print the current version"
-            it.dependsOn(setReleaseVersion)
-            it.doLast {
-                println("Projected version is: $ANSI_GREEN${it.project.version}$ANSI_RESET")
+        settings.gradle.rootProject { rootProject ->
+            if (!rootProject.plugins.hasPlugin(BasePlugin::class.java)) {
+                rootProject.plugins.apply(BasePlugin::class.java)
             }
-        }
 
-        project.tasks.register("createTag", CreateTagTask::class.java) { it ->
-            it.config.set(config)
-            it.releaseTagComment.set(extension.releaseTagComment)
-            it.addUnReleasedCommitsToTagComment.set(extension.addUnReleasedCommitsToTagComment)
-            it.workingDirectory.set(project.projectDir)
-        }
+            rootProject.tasks.register("printVersion") {
+                it.group = RELEASE_GROUP
+                it.description = "Print the current version"
+                it.doLast {
+                    println("Project version is: $ANSI_GREEN${it.project.version}$ANSI_RESET")
+                }
+            }
 
-        project.tasks.register("pushTag", PushTagTask::class.java) {
-            it.workingDirectory.set(project.projectDir)
+            rootProject.tasks.register("createTag", CreateTagTask::class.java) { it ->
+                it.config.set(buildConfig(extension))
+                it.releaseTagComment.set(extension.releaseTagComment)
+                it.addUnReleasedCommitsToTagComment.set(extension.addUnReleasedCommitsToTagComment)
+                it.workingDirectory.set(rootProject.projectDir)
+            }
+
+            rootProject.tasks.register("pushTag", PushTagTask::class.java) {
+                it.workingDirectory.set(rootProject.projectDir)
+            }
         }
     }
 
-    private fun buildConfig(extension: SemanticBuildVersioningExtension) {
+    private fun buildConfig(extension: SemanticBuildVersioningExtension): SemanticBuildVersionConfiguration {
+        var config = SemanticBuildVersionConfiguration()
         if (extension.startingVersion.isPresent) {
             config = config.copy(startingVersion = extension.startingVersion.get())
         }
@@ -90,5 +92,6 @@ abstract class SemanticBuildVersioningPlugin : Plugin<Project> {
         if (extension.extraReleaseBranches.isPresent) {
             config = config.copy(extraReleaseBranches = extension.extraReleaseBranches.get())
         }
+        return config
     }
 }

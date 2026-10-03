@@ -1,62 +1,59 @@
 package semverrelease
 
-import org.gradle.api.Project
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 
-abstract class SemanticBuildVersioningExtension(project: Project) {
-
-    private val objects = project.objects
+abstract class SemanticBuildVersioningExtension {
 
     // This option defines the starting version of the build in case there is no tag available to determine the next version.
     // The default value is "0.1.0".
-    @Input
-    val startingVersion: Property<String> = objects.property(String::class.java)
+    @get:Input
+    abstract val startingVersion: Property<String>
 
-    @Input
-    val tagPrefix: Property<String> = objects.property(String::class.java)
+    @get:Input
+    abstract val tagPrefix: Property<String>
 
-    @Input
-    val forceBump: Property<Boolean> = objects.property(Boolean::class.java)
+    @get:Input
+    abstract val forceBump: Property<Boolean>
 
-    @Input
-    val newPreRelease: Property<Boolean> = objects.property(Boolean::class.java)
+    @get:Input
+    abstract val newPreRelease: Property<Boolean>
 
-    @Input
-    val promoteToRelease: Property<Boolean> = objects.property(Boolean::class.java)
+    @get:Input
+    abstract val promoteToRelease: Property<Boolean>
 
-    @Input
-    val snapshot: Property<Boolean> = objects.property(Boolean::class.java)
+    @get:Input
+    abstract val snapshot: Property<Boolean>
 
-    @Input
-    val defaultBumpLevel: Property<ComponentToBump> = objects.property(ComponentToBump::class.java)
+    @get:Input
+    abstract val defaultBumpLevel: Property<ComponentToBump>
 
-    @Input
-    val componentToBump: Property<ComponentToBump> = objects.property(ComponentToBump::class.java)
-
-    @get:Nested
-    val autoBump: Property<AutoBump> = objects.property(AutoBump::class.java)
+    @get:Input
+    abstract val componentToBump: Property<ComponentToBump>
 
     @get:Nested
-    val snapshotConfig: Property<SnapshotConfig> = objects.property(SnapshotConfig::class.java)
+    abstract val autoBump: Property<AutoBump>
 
     @get:Nested
-    val preReleaseConfig: Property<PreReleaseConfig> = objects.property(PreReleaseConfig::class.java)
+    abstract val snapshotConfig: Property<SnapshotConfig>
 
-    @Input
-    val hotfixBranchPattern: Property<Regex> = objects.property(Regex::class.java)
+    @get:Nested
+    abstract val preReleaseConfig: Property<PreReleaseConfig>
 
-    @Input
-    val extraReleaseBranches: ListProperty<String> = objects.listProperty(String::class.java)
+    @get:Input
+    abstract val hotfixBranchPattern: Property<Regex>
 
-    @Input
-    @Optional
-    val releaseTagComment: Property<String> = objects.property(String::class.java).convention("Releasing")
+    @get:Input
+    abstract val extraReleaseBranches: ListProperty<String>
 
-    @Input
-    val addUnReleasedCommitsToTagComment: Property<Boolean> = objects.property(Boolean::class.java).convention(false)
+    @get:Input
+    @get:Optional
+    abstract val releaseTagComment: Property<String>
+
+    @get:Input
+    abstract val addUnReleasedCommitsToTagComment: Property<Boolean>
 
 }
