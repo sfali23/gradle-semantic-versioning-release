@@ -62,8 +62,8 @@ class StepDefinitions {
     @When("A tag with annotated: \\({bool}) flag is created")
     fun createAnnotatedTag(annotated: Boolean) {
         val semanticBuildVersion = SemanticBuildVersion(workingDirectory, config)
-        val nextVersion = semanticBuildVersion.determineVersion()
         semanticBuildVersion.requireCleanWorkingTree()
+        val nextVersion = semanticBuildVersion.determineVersion()
         val tag = "${config.tagPrefix}$nextVersion"
         val message = if (annotated) "Release: $tag" else null
         repository.tag(tag, annotated, message)
