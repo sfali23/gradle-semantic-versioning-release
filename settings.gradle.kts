@@ -13,7 +13,7 @@ pluginManagement {
         mavenCentral()
     }
     plugins {
-        id("io.github.sfali23.gradle-semantic-versioning-release") version "0.4.0"
+        id("io.github.sfali23.gradle-semantic-versioning-release") version "0.4.1"
     }
 }
 
