@@ -2,6 +2,7 @@ package semverrelease
 
 import com.alphasystem.gradle.semver.release.common.TestRepository
 import org.gradle.testkit.runner.GradleRunner
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -48,6 +49,10 @@ class SemanticBuildVersioningPluginTest {
                 """.trimIndent(),
             )
 
+            repository.add(".").commit("add build files")
+            repository.makeChanges()
+            val tagsBeforeBuild = repository.getAdapter().getGit().tagList().call().map { it.name }
+
             val result =
                 GradleRunner
                     .create()
@@ -59,6 +64,23 @@ class SemanticBuildVersioningPluginTest {
             val output = result.output
             assertTrue(output.contains("ROOT_VERSION=0.1.0"), "Expected root version 0.1.0 but output was:\n$output")
             assertTrue(output.contains("SUB_VERSION=0.1.0"), "Expected subproject version 0.1.0 but output was:\n$output")
+            assertEquals(tagsBeforeBuild, repository.getAdapter().getGit().tagList().call().map { it.name })
+
+            val failedRelease = GradleRunner.create()
+                .withProjectDir(projectDir)
+                .withPluginClasspath()
+                .withArguments("createTag", "--quiet")
+                .buildAndFail()
+            assertTrue(failedRelease.output.contains("Cannot create tag, there are uncommitted changes."))
+            assertEquals(tagsBeforeBuild, repository.getAdapter().getGit().tagList().call().map { it.name })
+
+            repository.commit("commit pending changes")
+            GradleRunner.create()
+                .withProjectDir(projectDir)
+                .withPluginClasspath()
+                .withArguments("createTag", "--quiet")
+                .build()
+            assertTrue(repository.getAdapter().getGit().tagList().call().any { it.name == "refs/tags/v0.1.0" })
         } finally {
             repository.close()
             projectDir.deleteRecursively()

@@ -2,15 +2,16 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-kotlin-jvm = "2.2.0"
-publish = "0.36.0"
-spotless = "8.5.1"
-jgit = "7.6.0.202603022253-r"
-typesafe = "1.4.8"
-junit-jupiter = "5.10.0"
-junit-platform = "1.10.0"
-cucumber-java = "7.14.0"
-cucumber-expressions = "16.1.2"
+kotlin-jvm = "2.4.21"
+publish = "0.37.0"
+spotless = "8.11.0"
+jgit = "7.8.1.202611041320-r"
+typesafe = "1.4.10"
+junit-jupiter = "6.1.3"
+junit-platform = "6.1.3"
+cucumber-java = "8.1.0"
+cucumber-expressions = "20.2.0"
+benManesVersions = "0.67.0"
 
 [libraries]
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
@@ -27,3 +28,4 @@ cucumber-junit-platform-engine = { module = "io.cucumber:cucumber-junit-platform
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-jvm" }
 publish = { id = "com.vanniktech.maven.publish", version.ref = "publish" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+benManesVersions = { id = "io.github.ben-manes.versions", version.ref = "benManesVersions"}

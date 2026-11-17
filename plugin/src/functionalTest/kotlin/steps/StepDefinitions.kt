@@ -7,6 +7,7 @@ import com.alphasystem.gradle.semver.release.internal.SemanticBuildVersionConfig
 import io.cucumber.java.ParameterType
 import io.cucumber.java.en.*
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.assertThrows
 import java.nio.file.Files
 import java.util.UUID
 
@@ -60,7 +61,9 @@ class StepDefinitions {
 
     @When("A tag with annotated: \\({bool}) flag is created")
     fun createAnnotatedTag(annotated: Boolean) {
-        val nextVersion = SemanticBuildVersion(workingDirectory, config).determineVersion()
+        val semanticBuildVersion = SemanticBuildVersion(workingDirectory, config)
+        semanticBuildVersion.requireCleanWorkingTree()
+        val nextVersion = semanticBuildVersion.determineVersion()
         val tag = "${config.tagPrefix}$nextVersion"
         val message = if (annotated) "Release: $tag" else null
         repository.tag(tag, annotated, message)
@@ -72,11 +75,10 @@ class StepDefinitions {
 
     @Then("Exception '{}' should be thrown when creating new tag")
     fun exceptionIsThrown(message: String) {
-        try {
-            repository.tag(SemanticBuildVersion(workingDirectory, config).determineVersion())
-        } catch (e: Exception) {
-            assertEquals(message, e.message)
+        val exception = assertThrows<IllegalArgumentException> {
+            createAnnotatedTag(false)
         }
+        assertEquals(message, exception.message)
     }
 
     @Then("Generated version should be {string}")

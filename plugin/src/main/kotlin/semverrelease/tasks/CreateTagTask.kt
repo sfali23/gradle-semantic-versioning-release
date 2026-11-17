@@ -52,6 +52,7 @@ abstract class CreateTagTask : DefaultTask() {
         val workingDir = workingDirectory.get().asFile
         val baseConfig = config.get()
         val semanticBuildVersion = SemanticBuildVersion(workingDir, baseConfig)
+        semanticBuildVersion.requireCleanWorkingTree()
         val tagPrefix = baseConfig.tagPrefix
         val version = project.version.toString()
         val message = getTagComment(semanticBuildVersion)

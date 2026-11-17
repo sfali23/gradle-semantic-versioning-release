@@ -29,10 +29,11 @@ class SemanticBuildVersion(workingDir: File, val baseConfig: SemanticBuildVersio
         return adapter.getUnReleasedCommits("$tagPrefix$version")
     }
 
+    fun requireCleanWorkingTree() {
+        require(!adapter.hasUncommittedChanges()) { "Cannot create tag, there are uncommitted changes." }
+    }
+
     fun determineVersion(): String {
-        if (adapter.hasUncommittedChanges()) {
-            throw IllegalArgumentException("Cannot determine next version, there are uncommitted changes.")
-        }
         val currentBranch = adapter.getCurrentBranch()
         val hotfixRequired = baseConfig.hotfixBranchPattern.nonEmpty(currentBranch)
         val snapshotRequired = snapshotRequired(currentBranch, hotfixRequired)
@@ -99,7 +100,7 @@ class SemanticBuildVersion(workingDir: File, val baseConfig: SemanticBuildVersio
 
             // if we have auto bump enabled, there is(are) previous tag(s), and if there are commits added between last tag
             // and current head, then if components to bump are empty at the end of process, then bump default configured bump level
-            val forcePush = baseConfig.isAutoBumpEnabled() && (tuple.hasCommits || !versionComponents.hasEssentialComponents())
+            val forcePush = baseConfig.isAutoBumpEnabled() && tuple.hasCommits
 
             return bumpVersion(forcePush, currentVersion, hotfixRequired, snapshotRequired, versionComponents)
         }
