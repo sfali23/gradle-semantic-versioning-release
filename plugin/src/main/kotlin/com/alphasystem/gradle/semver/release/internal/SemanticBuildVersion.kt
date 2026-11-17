@@ -29,10 +29,11 @@ class SemanticBuildVersion(workingDir: File, val baseConfig: SemanticBuildVersio
         return adapter.getUnReleasedCommits("$tagPrefix$version")
     }
 
+    fun requireCleanWorkingTree() {
+        require(!adapter.hasUncommittedChanges()) { "Cannot create tag, there are uncommitted changes." }
+    }
+
     fun determineVersion(): String {
-        if (adapter.hasUncommittedChanges()) {
-            throw IllegalArgumentException("Cannot determine next version, there are uncommitted changes.")
-        }
         val currentBranch = adapter.getCurrentBranch()
         val hotfixRequired = baseConfig.hotfixBranchPattern.nonEmpty(currentBranch)
         val snapshotRequired = snapshotRequired(currentBranch, hotfixRequired)

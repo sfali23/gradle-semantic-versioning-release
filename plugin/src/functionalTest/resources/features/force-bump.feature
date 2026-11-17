@@ -254,7 +254,7 @@ Feature: Branch with Force bump repository
     And Load semantic build config from ({forceBump=true, componentToBump=PATCH, snapshot=true})
     And Following annotated: <annotated> tags (v0.1.0,v0.2.0,v1.0.0) has been created
     When Make some changes
-    Then Exception 'Cannot determine next version, there are uncommitted changes.' should be thrown when creating new tag
+    Then Exception 'Cannot create tag, there are uncommitted changes.' should be thrown when creating new tag
     And Close resources
 
     Examples:
@@ -268,7 +268,7 @@ Feature: Branch with Force bump repository
     And Load semantic build config from ({forceBump=true, componentToBump=PATCH})
     And Following annotated: <annotated> tags (v0.1.0,v0.2.0,v1.0.0) has been created
     When Make some changes
-    Then Exception 'Cannot determine next version, there are uncommitted changes.' should be thrown when creating new tag
+    Then Exception 'Cannot create tag, there are uncommitted changes.' should be thrown when creating new tag
     And Close resources
 
     Examples:

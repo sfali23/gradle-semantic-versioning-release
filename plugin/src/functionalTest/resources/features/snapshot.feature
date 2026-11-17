@@ -138,7 +138,7 @@ Feature: Snapshot
     And Load semantic build config from ({snapshotConfig={appendCommitHash=<appendCommitHash>}})
     When Make changes and commit with message: 'snapshot with [<bumpComponent>]'
     And Make some changes
-    Then Exception 'Cannot determine next version, there are uncommitted changes.' should be thrown when creating new tag
+    Then Exception 'Cannot create tag, there are uncommitted changes.' should be thrown when creating new tag
     And Close resources
 
     Examples:
